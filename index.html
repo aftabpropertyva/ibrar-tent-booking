@@ -38,7 +38,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            padding-bottom: 160px; /* Space for fixed buttons */
+            padding-bottom: 180px; /* Space for fixed buttons */
         }
 
         header {
@@ -57,16 +57,50 @@
             color: var(--text);
         }
 
-        .item-list {
-            padding: 10px 20px;
+        .section {
+            padding: 15px 20px;
+            border-bottom: 8px solid var(--bg);
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--secondary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
         }
 
         .item-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 0;
+            padding: 12px 0;
             border-bottom: 1px solid var(--border);
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
         }
 
         .item-name {
@@ -99,17 +133,18 @@
             background: #eee;
         }
 
-        input[type="number"] {
+        .qty-input {
             width: 50px;
             text-align: center;
             border: none;
             font-size: 1.1rem;
             font-weight: bold;
-            -moz-appearance: textfield;
+            background: transparent;
         }
 
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
+        /* Hide number spinners */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
@@ -125,6 +160,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            z-index: 20;
         }
 
         .btn {
@@ -156,7 +192,6 @@
             border: 1px solid var(--border);
         }
 
-        /* Toast Notification */
         #toast {
             visibility: hidden;
             min-width: 200px;
@@ -167,7 +202,7 @@
             padding: 12px;
             position: fixed;
             z-index: 100;
-            bottom: 180px;
+            bottom: 200px;
             left: 50%;
             transform: translateX(-50%);
             font-size: 14px;
@@ -178,8 +213,8 @@
             animation: fadein 0.5s, fadeout 0.5s 2.5s;
         }
 
-        @keyframes fadein { from {bottom: 150px; opacity: 0;} to {bottom: 180px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 180px; opacity: 1;} to {bottom: 150px; opacity: 0;} }
+        @keyframes fadein { from {bottom: 170px; opacity: 0;} to {bottom: 200px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 200px; opacity: 1;} to {bottom: 170px; opacity: 0;} }
     </style>
 </head>
 <body>
@@ -189,8 +224,34 @@
         <h1>Ibrar Tent & Catering</h1>
     </header>
 
-    <div class="item-list" id="itemList">
-        <!-- Items will be injected here -->
+    <!-- Customer Info Section -->
+    <div class="section">
+        <span class="section-title">Customer Details</span>
+        <div class="form-group">
+            <label for="customerName">Full Name</label>
+            <input type="text" id="customerName" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+            <label for="eventDate">Event Date</label>
+            <input type="date" id="eventDate">
+        </div>
+    </div>
+
+    <!-- Equipment Section -->
+    <div class="section">
+        <span class="section-title">Equipment Selection</span>
+        <div id="itemList">
+            <!-- Items will be injected here -->
+        </div>
+    </div>
+
+    <!-- Other Items Section -->
+    <div class="section">
+        <span class="section-title">Additional Requirements</span>
+        <div class="form-group">
+            <label for="otherDetails">Other Items / Special Requests</label>
+            <textarea id="otherDetails" rows="3" placeholder="Any other items or details..."></textarea>
+        </div>
     </div>
 
     <div class="footer-actions">
@@ -205,7 +266,7 @@
     const items = [
         "Chairs", "Tables", "Trays", "Plates", "Jeg (Water Jug)", 
         "Glass", "Qanat (Large Tent)", "Chatri (Small Canopy)", 
-        "Large Items", "Small Items"
+        "Large Items", "Small Items", "Khashak (Wood)"
     ];
 
     const itemListContainer = document.getElementById('itemList');
@@ -218,7 +279,7 @@
             <div class="item-name">${item}</div>
             <div class="controls">
                 <button class="btn-circle" onclick="updateQty(${index}, -1)">-</button>
-                <input type="number" id="qty-${index}" value="0" min="0" readonly>
+                <input type="number" id="qty-${index}" class="qty-input" value="0" min="0" readonly>
                 <button class="btn-circle" onclick="updateQty(${index}, 1)">+</button>
             </div>
         `;
@@ -233,7 +294,10 @@
     }
 
     function resetAll() {
-        if (confirm("Are you sure you want to reset all quantities?")) {
+        if (confirm("Are you sure you want to reset all fields?")) {
+            document.getElementById('customerName').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('otherDetails').value = '';
             items.forEach((_, index) => {
                 document.getElementById(`qty-${index}`).value = 0;
             });
@@ -247,9 +311,16 @@
     }
 
     function sendToWhatsApp() {
+        const name = document.getElementById('customerName').value.trim();
+        const date = document.getElementById('eventDate').value;
+        const other = document.getElementById('otherDetails').value.trim();
+        
         let message = "Assalam u Alaikum! I want to book equipment:\n\n";
+        
+        if (name) message += `*Name:* ${name}\n`;
+        if (date) message += `*Event Date:* ${date}\n\n`;
+        
         let hasItems = false;
-
         items.forEach((item, index) => {
             const qty = parseInt(document.getElementById(`qty-${index}`).value);
             if (qty > 0) {
@@ -258,8 +329,13 @@
             }
         });
 
+        if (other) {
+            message += `\n*Other Requirements:*\n${other}\n`;
+            hasItems = true; // Consider "other" as an item selection
+        }
+
         if (!hasItems) {
-            alert("Please select at least 1 item.");
+            alert("Please select at least 1 item or provide details.");
             return;
         }
 
