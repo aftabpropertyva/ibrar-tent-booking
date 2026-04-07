@@ -89,14 +89,13 @@
             border-radius: 8px;
             font-size: 1rem;
             font-family: inherit;
+            background: var(--white);
         }
 
-        #dayDisplay {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
+        input[readonly] {
+            background-color: #f1f3f5;
             color: var(--primary);
-            display: none;
+            font-weight: 600;
         }
 
         .item-row {
@@ -242,7 +241,10 @@
         <div class="form-group">
             <label for="eventDate">Event Date</label>
             <input type="date" id="eventDate" onchange="updateDayName()">
-            <div id="dayDisplay">Day: <span id="dayName"></span></div>
+        </div>
+        <div class="form-group">
+            <label for="dayNameInput">Day Name</label>
+            <input type="text" id="dayNameInput" placeholder="Select a date first" readonly>
         </div>
     </div>
 
@@ -297,17 +299,15 @@
 
     function updateDayName() {
         const dateInput = document.getElementById('eventDate');
-        const dayDisplay = document.getElementById('dayDisplay');
-        const dayNameSpan = document.getElementById('dayName');
+        const dayNameInput = document.getElementById('dayNameInput');
         
         if (dateInput.value) {
             const date = new Date(dateInput.value);
             const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
             const dayName = days[date.getDay()];
-            dayNameSpan.textContent = dayName;
-            dayDisplay.style.display = 'block';
+            dayNameInput.value = dayName;
         } else {
-            dayDisplay.style.display = 'none';
+            dayNameInput.value = '';
         }
     }
 
@@ -322,7 +322,7 @@
         if (confirm("Are you sure you want to reset all fields?")) {
             document.getElementById('customerName').value = '';
             document.getElementById('eventDate').value = '';
-            document.getElementById('dayDisplay').style.display = 'none';
+            document.getElementById('dayNameInput').value = '';
             document.getElementById('otherDetails').value = '';
             items.forEach((_, index) => {
                 document.getElementById(`qty-${index}`).value = 0;
@@ -339,7 +339,7 @@
     function sendToWhatsApp() {
         const name = document.getElementById('customerName').value.trim();
         const date = document.getElementById('eventDate').value;
-        const dayName = document.getElementById('dayName').textContent;
+        const dayName = document.getElementById('dayNameInput').value;
         const other = document.getElementById('otherDetails').value.trim();
         
         let message = "Assalam u Alaikum! I want to book equipment:\n\n";
