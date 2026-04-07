@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ibrar Tent & Catering - Booking</title>
+    <style>
+        :root {
+            --primary: #25D366;
+            --secondary: #6c757d;
+            --bg: #f8f9fa;
+            --text: #212529;
+            --white: #ffffff;
+            --border: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 160px; /* Space for fixed buttons */
+        }
+
+        header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--text);
+        }
+
+        .item-list {
+            padding: 10px 20px;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .item-name {
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--white);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .btn-circle:active {
+            background: #eee;
+        }
+
+        input[type="number"] {
+            width: 50px;
+            text-align: center;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .footer-actions {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
+            padding: 20px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            height: 54px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--bg);
+            color: var(--secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 100;
+            bottom: 180px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+
+        @keyframes fadein { from {bottom: 150px; opacity: 0;} to {bottom: 180px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 180px; opacity: 1;} to {bottom: 150px; opacity: 0;} }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>Ibrar Tent & Catering</h1>
+    </header>
+
+    <div class="item-list" id="itemList">
+        <!-- Items will be injected here -->
+    </div>
+
+    <div class="footer-actions">
+        <button class="btn btn-primary" onclick="sendToWhatsApp()">📲 Send to WhatsApp</button>
+        <button class="btn btn-secondary" onclick="resetAll()">🔄 Reset All</button>
+    </div>
+</div>
+
+<div id="toast">✅ Opening WhatsApp...</div>
+
+<script>
+    const items = [
+        "Chairs", "Tables", "Trays", "Plates", "Jeg (Water Jug)", 
+        "Glass", "Qanat (Large Tent)", "Chatri (Small Canopy)", 
+        "Large Items", "Small Items"
+    ];
+
+    const itemListContainer = document.getElementById('itemList');
+
+    // Initialize items
+    items.forEach((item, index) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <div class="item-name">${item}</div>
+            <div class="controls">
+                <button class="btn-circle" onclick="updateQty(${index}, -1)">-</button>
+                <input type="number" id="qty-${index}" value="0" min="0" readonly>
+                <button class="btn-circle" onclick="updateQty(${index}, 1)">+</button>
+            </div>
+        `;
+        itemListContainer.appendChild(row);
+    });
+
+    function updateQty(index, change) {
+        const input = document.getElementById(`qty-${index}`);
+        let val = parseInt(input.value) + change;
+        if (val < 0) val = 0;
+        input.value = val;
+    }
+
+    function resetAll() {
+        if (confirm("Are you sure you want to reset all quantities?")) {
+            items.forEach((_, index) => {
+                document.getElementById(`qty-${index}`).value = 0;
+            });
+        }
+    }
+
+    function showToast() {
+        const toast = document.getElementById("toast");
+        toast.className = "show";
+        setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+    function sendToWhatsApp() {
+        let message = "Assalam u Alaikum! I want to book equipment:\n\n";
+        let hasItems = false;
+
+        items.forEach((item, index) => {
+            const qty = parseInt(document.getElementById(`qty-${index}`).value);
+            if (qty > 0) {
+                message += `- ${item}: ${qty}\n`;
+                hasItems = true;
+            }
+        });
+
+        if (!hasItems) {
+            alert("Please select at least 1 item.");
+            return;
+        }
+
+        message += "\nPlease confirm availability & pricing. JazakAllah!";
+        
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/923469368255?text=${encodedMessage}`;
+        
+        showToast();
+        
+        setTimeout(() => {
+            window.location.href = whatsappUrl;
+        }, 800);
+    }
+</script>
+
+</body>
+</html>
