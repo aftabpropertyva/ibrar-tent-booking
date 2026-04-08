@@ -17,12 +17,14 @@
 
     <style>
         :root {
-            --primary: #25D366;
-            --secondary: #6c757d;
-            --bg: #f8f9fa;
-            --text: #212529;
+            --primary: #1a3a52;
+            --accent: #d4af37;
+            --secondary: #5a6c7d;
+            --bg: #f5f7fa;
+            --text: #1a1a1a;
             --white: #ffffff;
-            --border: #dee2e6;
+            --border: #e0e6ed;
+            --success: #27ae60;
         }
 
         * {
@@ -31,14 +33,14 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg);
             color: var(--text);
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .app-container {
@@ -49,7 +51,8 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            padding-bottom: 180px; /* Space for fixed buttons */
+            padding-bottom: 200px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
 
         header {
@@ -57,7 +60,7 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--accent);
         }
 
         .header-banner {
@@ -74,43 +77,49 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            background: linear-gradient(transparent, rgba(26, 58, 82, 0.8));
             padding: 20px;
             color: white;
         }
 
         .header-content {
-            padding: 10px 20px;
+            padding: 12px 20px;
             text-align: center;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d5a7b 100%);
+            color: white;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.4rem;
-            color: var(--text);
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
         }
 
         .contact-info {
-            font-size: 1rem;
-            color: var(--primary);
-            font-weight: 700;
-            margin-top: 5px;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            margin-top: 3px;
             display: block;
             text-decoration: none;
         }
 
         .section {
-            padding: 15px 20px;
-            border-bottom: 8px solid var(--bg);
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
         .section-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
-            color: var(--secondary);
+            color: var(--primary);
             margin-bottom: 15px;
             display: block;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
         }
 
         .form-group {
@@ -120,78 +129,136 @@
         .form-group label {
             display: block;
             font-size: 0.9rem;
-            margin-bottom: 5px;
-            font-weight: 500;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--primary);
         }
 
         input[type="text"], input[type="date"], textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             border-radius: 8px;
             font-size: 1rem;
             font-family: inherit;
             background: var(--white);
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
         }
 
         input[readonly] {
             background-color: #f1f3f5;
             color: var(--primary);
             font-weight: 600;
+            cursor: default;
         }
 
-        .item-row {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .item-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
+            padding: 14px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
-        .item-row:last-child {
-            border-bottom: none;
+        .item-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
         }
 
-        .item-name {
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .controls {
+        .item-info {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
         }
 
-        .btn-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: var(--white);
-            font-size: 20px;
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            user-select: none;
-            transition: background 0.2s;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
-        .btn-circle:active {
-            background: #eee;
+        .item-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .item-unit {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            margin-left: 4px;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, #2d5a7b 100%);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .qty-btn:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
         }
 
         .qty-input {
             width: 50px;
             text-align: center;
             border: none;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: bold;
             background: transparent;
+            color: var(--primary);
         }
 
-        /* Hide number spinners */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
@@ -203,58 +270,77 @@
             bottom: 0;
             width: 100%;
             max-width: 480px;
-            background: var(--white);
-            padding: 20px;
-            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            background: linear-gradient(to top, var(--white), rgba(255,255,255,0.98));
+            padding: 16px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             z-index: 20;
+            border-top: 2px solid var(--border);
         }
 
         .btn {
             width: 100%;
             height: 54px;
-            border-radius: 12px;
+            border-radius: 10px;
             border: none;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.2s;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn:active {
-            opacity: 0.8;
+            transform: translateY(2px);
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--success) 0%, #229954 100%);
             color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(39, 174, 96, 0);
+            }
         }
 
         .btn-secondary {
-            background-color: var(--bg);
-            color: var(--secondary);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary) 0%, #2d5a7b 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
         }
 
         #toast {
             visibility: hidden;
             min-width: 200px;
-            background-color: #333;
-            color: #fff;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
             text-align: center;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 14px;
             position: fixed;
             z-index: 100;
-            bottom: 200px;
+            bottom: 220px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
 
         #toast.show {
@@ -262,8 +348,24 @@
             animation: fadein 0.5s, fadeout 0.5s 2.5s;
         }
 
-        @keyframes fadein { from {bottom: 170px; opacity: 0;} to {bottom: 200px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 200px; opacity: 1;} to {bottom: 170px; opacity: 0;} }
+        @keyframes fadein { from {bottom: 190px; opacity: 0;} to {bottom: 220px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 220px; opacity: 1;} to {bottom: 190px; opacity: 0;} }
+
+        @media (max-width: 360px) {
+            .item-card {
+                padding: 12px;
+            }
+            
+            .qty-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .qty-input {
+                width: 45px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -272,7 +374,7 @@
     <header>
         <div class="header-banner">
             <div class="header-overlay">
-                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Ibrar Tent & Catering</div>
+                <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--accent);">Ibrar Tent & Catering</div>
             </div>
         </div>
         <div class="header-content">
@@ -301,7 +403,7 @@
     <!-- Equipment Section -->
     <div class="section">
         <span class="section-title">Equipment Selection</span>
-        <div id="itemList">
+        <div class="items-grid" id="itemList">
             <!-- Items will be injected here -->
         </div>
     </div>
@@ -311,7 +413,7 @@
         <span class="section-title">Additional Requirements</span>
         <div class="form-group">
             <label for="otherDetails">Other Items / Special Requests</label>
-            <textarea id="otherDetails" rows="3" placeholder="Any other items or details..."></textarea>
+            <textarea id="otherDetails" placeholder="Any other items or details..."></textarea>
         </div>
     </div>
 
@@ -325,26 +427,49 @@
 
 <script>
     const items = [
-        "Chairs", "Tables", "Trays", "Plates", "Jeg (Water Jug)", 
-        "Glass", "Qanat (Large Tent)", "Chatri (Small Canopy)", 
-        "Large Items", "Small Items", "Khashak (Wood)"
+        { name: "Chairs", icon: "🪑", unit: "" },
+        { name: "VIP Chairs", icon: "👑", unit: "" },
+        { name: "Tables", icon: "🪑", unit: "" },
+        { name: "VIP Table", icon: "👑", unit: "" },
+        { name: "Trays", icon: "🍽️", unit: "" },
+        { name: "Plates", icon: "🍴", unit: "" },
+        { name: "Jeg (Water Jug)", icon: "🫖", unit: "" },
+        { name: "Glass", icon: "🥤", unit: "" },
+        { name: "Qanat (Large Tent)", icon: "⛺", unit: "" },
+        { name: "Chatri (Small Canopy)", icon: "☂️", unit: "" },
+        { name: "Large Chatri", icon: "☂️", unit: "" },
+        { name: "Cooler", icon: "❄️", unit: "" },
+        { name: "Khashak (Wood)", icon: "🪵", unit: "Ton" },
+        { name: "Qaleen", icon: "🧵", unit: "" },
+        { name: "Stage", icon: "🎭", unit: "" },
+        { name: "Anghari", icon: "🪜", unit: "" },
+        { name: "Tab", icon: "🔊", unit: "" },
+        { name: "Khanak", icon: "🔗", unit: "" },
+        { name: "Patela", icon: "🍳", unit: "" },
+        { name: "Sandoq", icon: "📦", unit: "" }
     ];
 
     const itemListContainer = document.getElementById('itemList');
 
     // Initialize items
     items.forEach((item, index) => {
-        const row = document.createElement('div');
-        row.className = 'item-row';
-        row.innerHTML = `
-            <div class="item-name">${item}</div>
-            <div class="controls">
-                <button class="btn-circle" onclick="updateQty(${index}, -1)">-</button>
-                <input type="number" id="qty-${index}" class="qty-input" value="0" min="0" readonly>
-                <button class="btn-circle" onclick="updateQty(${index}, 1)">+</button>
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.innerHTML = `
+            <div class="item-info">
+                <div class="item-icon">${item.icon}</div>
+                <div>
+                    <span class="item-name">${item.name}</span>
+                    ${item.unit ? `<span class="item-unit">(${item.unit})</span>` : ''}
+                </div>
+            </div>
+            <div class="quantity-control">
+                <button class="qty-btn" onclick="updateQty(${index}, -1)">−</button>
+                <input type="number" id="qty-${index}" class="qty-input" value="0" min="0">
+                <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
             </div>
         `;
-        itemListContainer.appendChild(row);
+        itemListContainer.appendChild(card);
     });
 
     function updateDayName() {
@@ -403,7 +528,8 @@
         items.forEach((item, index) => {
             const qty = parseInt(document.getElementById(`qty-${index}`).value);
             if (qty > 0) {
-                message += `- ${item}: ${qty}\n`;
+                const unit = item.unit ? ` ${item.unit}` : '';
+                message += `- ${item.name}: ${qty}${unit}\n`;
                 hasItems = true;
             }
         });
